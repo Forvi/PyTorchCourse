@@ -8,6 +8,10 @@ import numpy as np
 class CsvDataset(data.Dataset):
     
     """
+        ЗАДАНИЕ 2.2 "Эксперименты с различными датасетами" НАХОДИТСЯ В 
+        lesson2/homework/homework_model_modification.py, А СОХРАНЕННЫЕ МОДЕЛИ
+        В lesson2/homework/models
+    
         Реализация датасета
         В конструкторе указываются:
             - путь до файла
