@@ -4,7 +4,7 @@ import torch.optim as optim
 from models.LinearModels import LinearRegressionTorch
 from homework_datasets import CsvDataset
 from torch.utils.data import DataLoader
-from utils.prints import log_epoch
+from utils.util import log_epoch
 
 if __name__ == '__main__':
     
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     criterion = nn.MSELoss() # MSE
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE) # SGD
     
-    # Обучение (тут всё как на лекции)
+    # Обучение
     for epoch in range(1, EPOCHS):
         total_loss = 0
         
@@ -54,6 +54,3 @@ if __name__ == '__main__':
         
         if epoch % 10 == 0:
             log_epoch(epoch, avg_loss)
-            
-    # Сохранение модели
-    torch.save(model.state_dict(), './lesson2/homework/models/linreg_mse_sgd.pth')

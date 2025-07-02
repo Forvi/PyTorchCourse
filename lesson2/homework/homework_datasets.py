@@ -58,7 +58,7 @@ class CsvDataset(data.Dataset):
             
     # Декодирует бинарные признаки алгоритмом LabelEncoder
     def decode_binary(self) -> None:
-        if self.binary_cols is None or len(self.cat_cols) == 0:
+        if self.binary_cols is None or len(self.binary_cols) == 0:
             raise TypeError('There are no binary features to encode')
         for col in self.binary_cols:
             encoder = LabelEncoder()
@@ -66,11 +66,20 @@ class CsvDataset(data.Dataset):
         
     # Нормализует признаки алгоритмом StandardScaler
     # Возвращает tensor
-    def normalize(self) -> None:
+    def normalize(self, target: str = None) -> None:
         try:
             scaler = StandardScaler()
-            scaled_array = scaler.fit_transform(self.data)
-            self.data = pd.DataFrame(scaled_array, columns=self.data.columns, index=self.data.index)
+            
+            if target is not None:
+                if target not in self.data.columns:
+                    raise ValueError(f"Target column '{target}' not found in data columns")
+                cols = self.data.columns.drop(target)
+                scaled_array = scaler.fit_transform(self.data[cols])
+                scaled_df = pd.DataFrame(scaled_array, columns=cols, index=self.data.index)
+                self.data = pd.concat([scaled_df, self.data[[target]]], axis=1)
+            else:
+                scaled_array = scaler.fit_transform(self.data)
+                self.data = pd.DataFrame(scaled_array, columns=self.data.columns, index=self.data.index)
         except Exception as e:
             e.add_note('An unexpected error occurred')
             e.add_note('Try to use CsvDataset.decode_binary() and CsvDataset.decode_categorical()')

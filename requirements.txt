@@ -4,3 +4,7 @@ torchvision
 numpy
 scikit-learn
 pandas
+tqdm
+matplotlib
+seaborn
+torchmetrics
