@@ -129,14 +129,13 @@ class CsvDataset(data.Dataset):
             raise
 
 
-path = 'lesson2/homework/data/insurance.csv'
-num = ['age', 'bmi', 'charges', 'children']
-cat = ['region']
-binary = ['sex', 'smoker']
-targ = ['charges']
-dataset = CsvDataset(file_path=path, num_cols=num, cat_cols=cat, binary_cols=binary, target=targ)
-dataset.decode_categorical()
-dataset.decode_binary()
-dataset.remove_outlier()
-t = dataset.get_dataframe()
-print(t)
+# path = 'lesson2/homework/data/insurance.csv'
+# num = ['age', 'bmi', 'charges', 'children']
+# cat = ['region']
+# binary = ['sex', 'smoker']
+# targ = ['charges']
+# dataset = CsvDataset(file_path=path, num_cols=num, cat_cols=cat, binary_cols=binary, target=targ)
+# dataset.decode_categorical()
+# dataset.decode_binary()
+# dataset.remove_outlier()
+# t = dataset.get_dataframe()

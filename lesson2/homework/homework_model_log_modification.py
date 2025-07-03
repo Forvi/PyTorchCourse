@@ -47,9 +47,9 @@ if __name__ == '__main__':
     
     # Дополнительная настройка и метрики
     features_size = dataset[0][0].shape[0]
-    model = LinearRegressionTorch(in_features=features_size)
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE) # SGD
+    # model = LinearRegressionTorch(in_features=features_size)
+    # criterion = nn.BCEWithLogitsLoss()
+    # optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE) # SGD
     
     num_classes = int(10)
     model = MulticlassModel(in_features=features_size, num_classes=num_classes)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     plt.xlabel('Predicted')
     plt.ylabel('True')
     plt.title('Confusion Matrix')
-    plt.savefig('./lesson2/homework/plots/confusion_matrix1.png') 
+    # plt.savefig('./lesson2/homework/plots/confusion_matrix1.png') 
     
     # Сохранение модели
     # torch.save(model.state_dict(), './lesson2/homework/models/linlog_mse_sgd.pth')
