@@ -4,6 +4,7 @@ import torch.nn as nn
 from tqdm import tqdm
 import torch.optim as optim
 
+
 def run_epoch(model, data_loader, criterion, optimizer=None, device='cpu', is_test=False):
     if is_test:
         model.eval()
@@ -62,6 +63,7 @@ def train_model(model, train_loader, test_loader, epochs=10, lr=0.001, device='c
         'test_losses': test_losses,
         'test_accs': test_accs
     } 
+
 
 def count_parameters(model):
     """Подсчитывает количество параметров модели"""
