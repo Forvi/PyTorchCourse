@@ -1,0 +1,20 @@
+{
+    "input_size": 784,
+    "num_classes": 10,
+    "layers": [
+        {"type": "linear", "size": 256},
+        {"type": "batchnorm"},
+        {"type": "relu"},
+        {"type": "dropout", "p": 0.5},
+
+        {"type": "linear", "size": 128},
+        {"type": "batchnorm"},
+        {"type": "relu"},
+        {"type": "dropout", "p": 0.5},
+
+        {"type": "linear", "size": 64},
+        {"type": "batchnorm"},
+        {"type": "relu"},
+        {"type": "dropout", "p": 0.5}
+    ]
+}

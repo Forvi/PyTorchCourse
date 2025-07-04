@@ -10,17 +10,17 @@ from utils.visualization_utils import plot_training_history
 EPOCHS = 10
 LR = 0.001
 BATCH_SIZE = 128
-# INPUT_SIZE = 3072
-INPUT_SIZE = 784
+INPUT_SIZE = 3072
+# INPUT_SIZE = 784
 NUM_CLASSES = 10
 
-config_path = './lesson3/homework/configs/task2/config_3layer_verybig.json'
+config_path = './lesson3/homework/configs/task3/config_dropout_batchnorm.json'
 model = FCN(config_path=config_path, input_size=INPUT_SIZE, num_classes=NUM_CLASSES)
 
 print(model)
 
-train_loader, test_loader = get_mnist_loaders(batch_size=BATCH_SIZE)
-# train_loader, test_loader = get_cifar_loaders(batch_size=BATCH_SIZE)
+# train_loader, test_loader = get_mnist_loaders(batch_size=BATCH_SIZE)
+train_loader, test_loader = get_cifar_loaders(batch_size=BATCH_SIZE)
 
 start_time = time.time()
 history = train_model(model, train_loader, test_loader, epochs=EPOCHS, lr=LR, device='cpu')
@@ -30,7 +30,7 @@ training_time = end_time - start_time
 print(f"Количество параметров модели: {count_parameters(model)}")
 print(f"Время обучения ({EPOCHS} эпох): {training_time:.2f} секунд")
 
-plot_training_history(history, './lesson3/homework/plots/task2/verybig_mnist.png')
+plot_training_history(history, './lesson3/homework/plots/task3/dropout_batch_cifar.png')
 
 
 print(f"Точность на train: {history['train_accs'][-1]:.4f}")

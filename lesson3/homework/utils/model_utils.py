@@ -44,7 +44,8 @@ class FCN(nn.Module):
                 layers.append(nn.Tanh())
                 
             elif layer_type == 'dropout':
-                rate = layer_spec.get('rate', 0.5)
+                p = layer_spec.get('p')
+                rate = layer_spec.get('rate', p)
                 layers.append(nn.Dropout(rate))
                 
             elif layer_type == 'batch_norm':

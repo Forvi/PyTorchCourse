@@ -2,7 +2,6 @@ import json
 import os
 import time
 
-import matplotlib.pyplot as plt
 from utils.dataset_utils import get_cifar_loaders, get_mnist_loaders
 from utils.experiment_utils import count_parameters, train_model
 from utils.model_utils import FCN
