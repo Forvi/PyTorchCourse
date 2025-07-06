@@ -43,6 +43,62 @@ class CNN(nn.Module):
         return x
 
 
+
+class CustomCNN(nn.Module):
+    """Простая сверточная нейросеть с настраиваемым размером ядра свертки.
+
+    Args:
+        input_channels (int): число входных каналов (по умолчанию 1)
+        num_classes (int): число классов на выходе (по умолчанию 10)
+        kernel_size (int): размер ядра свертки (по умолчанию 3)
+    """
+    def __init__(self, input_channels=1, num_classes=10, kernel_size=3):
+        super().__init__()
+        padding = kernel_size // 2
+
+        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=kernel_size, stride=1, padding=padding)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=kernel_size, stride=1, padding=padding)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(64 * 8 * 8, 128)
+        self.fc2 = nn.Linear(128, num_classes)
+        self.dropout = nn.Dropout(0.25)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
+
+class CNN_1x1_3x3(nn.Module):
+    """Сверточная нейросеть с комбинированным размером свертки 1x1 и 3x3.
+
+    Args:
+        input_channels (int): число входных каналов (по умолчанию 1)
+        num_classes (int): число классов на выходе (по умолчанию 10)
+    """
+    def __init__(self, input_channels=1, num_classes=10):
+        super().__init__()
+        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=1, stride=1, padding=0) # первый сверточный слой 1x1
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1) # второй сверточный слой 3x3
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(64 * 16 * 16, 128)
+        self.fc2 = nn.Linear(128, num_classes)
+        self.dropout = nn.Dropout(0.25)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))   # 1x1 свертка + ReLU
+        x = self.pool(F.relu(self.conv2(x)))  # 3x3 свертка + ReLU + pooling
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
+
 class ResidualBlock(nn.Module):
     """
     Residual блок для сверточных сетей (ResNet).

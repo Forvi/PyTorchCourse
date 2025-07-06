@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 
-class FCN(nn.Module):
+class FC(nn.Module):
     """
     Полносвязная нейронная сеть.
 
