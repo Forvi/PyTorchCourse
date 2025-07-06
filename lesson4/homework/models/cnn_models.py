@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
+import torch
     
 class CNN(nn.Module):
     """ Простая сверточная нейронная сеть для MNIST.
@@ -99,50 +99,114 @@ class CNN_1x1_3x3(nn.Module):
         return x
 
 
-class ResidualBlock(nn.Module):
+class LayersCNN(nn.Module):
     """
-    Residual блок для сверточных сетей (ResNet).
+    Универсальная CNN с настраиваемой глубиной.
 
     Args:
-        in_channels (int): число входных каналов
-        out_channels (int): число выходных каналов
-        stride (int): шаг свертки (по умолчанию 1)
-
-    Attributes:
-        conv1: первый сверточный слой 3x3 с заданным stride
-        bn1: батч-нормализация после conv1
-        conv2: второй сверточный слой 3x3, stride=1
-        bn2: батч-нормализация после conv2
-        shortcut: последовательность слоев для выравнивания размерности входа (1x1 conv + bn), если требуется
+        input_channels (int): число входных каналов (по умолчанию 3 для CIFAR)
+        num_classes (int): число классов на выходе (по умолчанию 10)
+        num_conv_layers (int): количество сверточных слоев (2, 4, 6+)
+        use_residual (bool): использовать ли residual-блоки (по умолчанию False)
+        kernel_size (int): размер ядра свертки (по умолчанию 3)
+        output_spatial_size (int): желаемый пространственный размер после адаптивного пулинга (например, 4)
     """
+    def __init__(self, input_channels=3, num_classes=10, num_conv_layers=2, use_residual=False, kernel_size=3, output_spatial_size=4):
+        super().__init__()
+        padding = kernel_size // 2
+        self.use_residual = use_residual
+        # self.pool = nn.MaxPool2d(2, 2)
+        self.dropout = nn.Dropout(0.25)
+        channels = [input_channels, 32, 64, 128, 256, 512, 512, 1024, 1024]
+        self.adaptive_pool = nn.AdaptiveAvgPool2d((output_spatial_size, output_spatial_size))
+
+        if use_residual:
+            self.conv1 = nn.Conv2d(input_channels, 32, kernel_size, stride=1, padding=padding)
+            self.bn1 = nn.BatchNorm2d(32)
+            self.res_blocks = nn.ModuleList()
+            self.res_blocks.append(ResidualBlock(32, 32))
+            self.res_blocks.append(ResidualBlock(32, 64, stride=2))
+            self.res_blocks.append(ResidualBlock(64, 64))
+            
+            self.fc = nn.Linear(64 * output_spatial_size * output_spatial_size, num_classes)
+        else:
+            conv_layers_list = []
+            in_ch = input_channels
+            if num_conv_layers >= 2:
+                conv_layers_list.append(nn.Conv2d(in_ch, channels[1], kernel_size, stride=1, padding=padding))
+                conv_layers_list.append(nn.ReLU())
+                conv_layers_list.append(nn.MaxPool2d(2, 2))
+                in_ch = channels[1]
+
+            if num_conv_layers >= 4:
+                conv_layers_list.append(nn.Conv2d(in_ch, channels[2], kernel_size, stride=1, padding=padding))
+                conv_layers_list.append(nn.ReLU())
+                conv_layers_list.append(nn.MaxPool2d(2, 2))
+                in_ch = channels[2]
+
+            if num_conv_layers >= 6:
+                conv_layers_list.append(nn.Conv2d(in_ch, channels[3], kernel_size, stride=1, padding=padding))
+                conv_layers_list.append(nn.ReLU())
+                conv_layers_list.append(nn.MaxPool2d(2, 2))
+                in_ch = channels[3]
+            
+            for i in range(3, num_conv_layers): 
+                if i + 1 < len(channels):
+                    conv_layers_list.append(nn.Conv2d(in_ch, channels[i+1], kernel_size, stride=1, padding=padding))
+                    conv_layers_list.append(nn.ReLU())
+                    if i < num_conv_layers -1: 
+                        conv_layers_list.append(nn.MaxPool2d(2, 2)) 
+                    in_ch = channels[i+1]
+
+
+            self.conv_layers = nn.Sequential(*conv_layers_list)
+            
+            with torch.no_grad():
+                dummy_input = torch.zeros(1, input_channels, 32, 32)
+                dummy_output = self.conv_layers(dummy_input)
+                dummy_output = self.adaptive_pool(dummy_output)
+                n_size = dummy_output.view(1, -1).size(1)
+
+            self.fc1 = nn.Linear(n_size, 128)
+            self.fc2 = nn.Linear(128, num_classes)
+
+    def forward(self, x):
+        if self.use_residual:
+            x = F.relu(self.bn1(self.conv1(x)))
+            for block in self.res_blocks:
+                x = block(x)
+            x = self.adaptive_pool(x) 
+            x = x.view(x.size(0), -1)
+            x = self.fc(x)
+        else:
+            x = self.conv_layers(x)
+            x = self.adaptive_pool(x) 
+            x = x.view(x.size(0), -1)
+            x = F.relu(self.fc1(x))
+            x = self.dropout(x)
+            x = self.fc2(x)
+        return x
+
+
+class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
         super().__init__()
         self.conv1 = nn.Conv2d(in_channels, out_channels, 3, stride, 1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.conv2 = nn.Conv2d(out_channels, out_channels, 3, 1, 1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channels)
-        
         self.shortcut = nn.Sequential()
         if stride != 1 or in_channels != out_channels:
             self.shortcut = nn.Sequential(
                 nn.Conv2d(in_channels, out_channels, 1, stride, bias=False),
                 nn.BatchNorm2d(out_channels)
             )
-    
     def forward(self, x):
-        """
-        Args:
-            x (torch.Tensor): входной батч изображения
-
-        Returns:
-            torch.Tensor: [batch_size, num_classes]
-        """
         out = F.relu(self.bn1(self.conv1(x)))
         out = self.bn2(self.conv2(out))
         out += self.shortcut(x)
         out = F.relu(out)
         return out
-    
 
 class CNNWithResidual(nn.Module):
     """ Сверточная сеть с использованием Residual блоками.
