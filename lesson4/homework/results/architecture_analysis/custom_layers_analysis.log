@@ -1,0 +1,26 @@
+INFO:root:Getting the dataset
+INFO:root:Starting experiment for model: StandardCNN
+INFO:root:Number of parameters for StandardCNN: 545098
+INFO:root:Training StandardCNN
+INFO:root:Training time for StandardCNN: 421.38 seconds
+INFO:root:Starting experiment for model: CustomConvCNN
+INFO:root:Number of parameters for CustomConvCNN: 545100
+INFO:root:Training CustomConvCNN
+INFO:root:Training time for CustomConvCNN: 490.97 seconds
+INFO:root:Starting experiment for model: AttentionCNN
+INFO:root:Number of parameters for AttentionCNN: 549804
+INFO:root:Training AttentionCNN
+INFO:root:Training time for AttentionCNN: 944.68 seconds
+INFO:root:Starting experiment for model: SwishCNN
+INFO:root:Number of parameters for SwishCNN: 545098
+INFO:root:Training SwishCNN
+INFO:root:Training time for SwishCNN: 535.10 seconds
+INFO:root:Starting experiment for model: GeMCNN
+INFO:root:Number of parameters for GeMCNN: 29003
+INFO:root:Training GeMCNN
+INFO:root:Training time for GeMCNN: 496.80 seconds
+INFO:root:Starting experiment for model: AllCustomCNN
+INFO:root:Number of parameters for AllCustomCNN: 33711
+INFO:root:Training AllCustomCNN
+INFO:root:Training time for AllCustomCNN: 3021.48 seconds
+INFO:root:Results saved to ./lesson4/homework/results/architecture_analysis/custom_layers_results.json
