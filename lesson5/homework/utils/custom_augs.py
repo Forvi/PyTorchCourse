@@ -1,6 +1,7 @@
 import random
 import torch
-import torchvision.transforms.functional as TF
+import torchvision.transforms.functional as F
+from torchvision.transforms import RandomPerspective
 from PIL import Image, ImageFilter, ImageEnhance
 import numpy as np
 
@@ -27,14 +28,10 @@ class RandomPerspectiveWarp:
     def __call__(self, img):
         if random.random() < self.p:
             width, height = img.size
-            startpoints, endpoints = TF.get_perspective_params(
-                startpoints=[(0,0), (width,0), (width,height), (0,height)],
-                distortion_scale=self.distortion_scale,
-                height=height,
-                width=width
-            )
-            return TF.perspective(img, startpoints, endpoints)
+            startpoints, endpoints = RandomPerspective.get_params(width, height, self.distortion_scale)
+            return F.perspective(img, startpoints, endpoints)
         return img
+
 
 class RandomBrightnessContrast:
     """Случайная яркость и контраст с вероятностью p."""

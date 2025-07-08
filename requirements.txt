@@ -8,3 +8,6 @@ tqdm
 matplotlib
 seaborn
 torchmetrics
+opencv-python
+psutil
+tokenizers

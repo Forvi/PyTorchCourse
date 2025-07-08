@@ -1,3 +1,4 @@
+from torchvision import transforms
 import torch
 import random
 import numpy as np
@@ -9,7 +10,9 @@ class AddGaussianNoise:
     def __init__(self, mean=0., std=0.1):
         self.mean = mean
         self.std = std
-    def __call__(self, tensor):
+    def __call__(self, img):
+        to_tensor = transforms.ToTensor()
+        tensor = to_tensor(img) 
         return tensor + torch.randn_like(tensor) * self.std + self.mean
 
 class RandomErasingCustom:
@@ -123,3 +126,28 @@ class MixUp:
             return img1
         lam = np.random.beta(self.alpha, self.alpha)
         return lam * img1 + (1 - lam) * img2 
+    
+
+class AugmentationPipeline:
+    def __init__(self):
+        self.augmentations = dict()
+
+    def add_augmentation(self, name, aug):
+        """Добавить аугментацию с именем name."""
+        self.augmentations[name] = aug
+
+    def remove_augmentation(self, name):
+        """Удалить аугментацию по имени."""
+        if name in self.augmentations:
+            del self.augmentations[name]
+
+    def apply(self, image):
+        """Применить все аугментации по очереди к изображению."""
+        augmented = image
+        for aug in self.augmentations.values():
+            augmented = aug(augmented)
+        return augmented
+
+    def get_augmentations(self):
+        """Вернуть список имён добавленных аугментаций."""
+        return list(self.augmentations.keys())

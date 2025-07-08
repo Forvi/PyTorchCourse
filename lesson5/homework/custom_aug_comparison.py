@@ -30,9 +30,7 @@ if __name__ == '__main__':
 
     to_tensor = torch.transforms.ToTensor()
     for aug, name in extra_augs:
-        # Применяем к тензору, поэтому сначала преобразуем оригинал
         tensor_img = to_tensor(original_img)
         aug_img = aug(tensor_img)
-        # Для визуализации преобразуем обратно в PIL
         aug_img_pil = F.to_pil_image(aug_img)
         show_single_augmentation(original_img, aug_img_pil, title=name, image_name=name.replace(" ", "_").lower())
